@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>net.cristcost</groupId>
+		<artifactId>asynchronize-apt</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>asynchronize-processor</artifactId>
+	<packaging>jar</packaging>
+	<name>Asynchronize :: Annotation Processor</name>
+	<description>APT processor to generate an asynchronous version of interfaces</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.squareup</groupId>
+			<artifactId>javapoet</artifactId>
+			<version>${javapoet.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<!-- Disable processing or maven will process this project itself -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${compiler.plugin.version}</version>
+				<configuration>
+					<proc>none</proc>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

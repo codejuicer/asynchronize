@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.cristcost</groupId>
+	<artifactId>asynchronize-apt</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Asynchronize :: Parent</name>
+	<description>APT processor to generate an asynchronous version of interfaces</description>
+
+	<modules>
+		<module>asynchronize-processor</module>
+		<module>asynchronize-example</module>
+  	</modules>
+
+
+	<developers>
+		<developer>
+			<id>cristcost</id>
+			<name>Cristiano Costantini</name>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
+	<properties>
+
+		<!-- Generic properties -->
+		<java.version>1.7</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		
+		<javapoet.version>1.2.0</javapoet.version>
+
+		<compiler.plugin.version>3.1</compiler.plugin.version>
+	</properties>
+
+
+	<build>
+		<!-- Manage version of default plugin -->
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	
+</project>
