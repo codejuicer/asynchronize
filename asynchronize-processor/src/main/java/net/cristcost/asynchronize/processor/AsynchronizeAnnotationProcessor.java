@@ -1,12 +1,14 @@
 package net.cristcost.asynchronize.processor;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeSpec.Builder;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.List;
 import java.util.Set;
 
@@ -20,9 +22,10 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic.Kind;
-import javax.tools.JavaFileObject;
 
 @SupportedAnnotationTypes({
     "net.cristcost.asynchronize.processor.Asynchronize"
@@ -59,16 +62,14 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
       PackageElement pkg = processingEnv.getElementUtils().getPackageOf(superClassName);
       String packageName = pkg.isUnnamed() ? null : pkg.getQualifiedName().toString();
 
-      // MethodSpec.Builder method =
-      // MethodSpec.methodBuilder("create").addModifiers(Modifier.PUBLIC).addParameter(
-      // String.class, "id").returns(TypeName.get(superClassName.asType()));
-
-      TypeSpec typeSpec =
-          TypeSpec.interfaceBuilder(asyncClassSimpleName).build();
-          // .addMethod(method.build()).build();
+      Builder interfaceBuilder = TypeSpec.interfaceBuilder(asyncClassSimpleName);
+      for (ExecutableElement methodElement : methodsToAsyncronize) {
+        interfaceBuilder.addMethod(createAsyncMethod(methodElement));
+      }
 
       // Write file
-      JavaFile.builder(packageName, typeSpec).build().writeTo(processingEnv.getFiler());
+      JavaFile.builder(packageName, interfaceBuilder.build()).build().writeTo(
+          processingEnv.getFiler());
 
       // JavaWriter jw = new JavaWriter(writer);
       //
@@ -118,6 +119,28 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
     } catch (IOException e) {
       processingEnv.getMessager().printMessage(Kind.ERROR, e.getMessage());
     }
+  }
+
+  private MethodSpec createAsyncMethod(ExecutableElement methodElement) {
+    MethodSpec.Builder method =
+        MethodSpec.methodBuilder(methodElement.getSimpleName().toString());
+    method.addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
+
+    for (VariableElement variableElement : methodElement.getParameters()) {
+
+      method.addParameter(TypeName.get(variableElement.asType()),
+          variableElement.getSimpleName().toString());
+    }
+
+    TypeName returnType = TypeName.get(methodElement.getReturnType());
+    if (returnType.isPrimitive() || returnType == TypeName.VOID) {
+      returnType = returnType.box();
+    }
+    method.addParameter(ParameterizedTypeName.get(ClassName.get(AsyncCallback.class),
+        returnType), "callback");
+
+    // method.returns(TypeName.get(superClassName.asType()));
+    return method.build();
   }
 
 }
