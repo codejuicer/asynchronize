@@ -5,4 +5,5 @@ import net.cristcost.asynchronize.processor.Asynchronize;
 @Asynchronize
 public interface YinService extends CoreService {
 
+  void yinMethod();
 }

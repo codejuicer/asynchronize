@@ -6,4 +6,5 @@ import net.cristcost.asynchronize.processor.Asynchronize;
 
 public interface CoreService {
 
+  void coreMethod();
 }

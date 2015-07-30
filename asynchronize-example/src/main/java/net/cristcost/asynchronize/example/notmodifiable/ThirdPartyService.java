@@ -1,8 +1,6 @@
 package net.cristcost.asynchronize.example.notmodifiable;
 
-import net.cristcost.asynchronize.processor.Asynchronize;
-
-@Asynchronize
 public interface ThirdPartyService {
 
+  void thirdPartyMethod();
 }
