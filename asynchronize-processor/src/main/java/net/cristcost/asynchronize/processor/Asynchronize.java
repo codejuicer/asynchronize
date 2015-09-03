@@ -15,6 +15,6 @@ public @interface Asynchronize {
 
   Class<?>callback() default AsyncCallback.class;
 
-  Class<?>returnType() default Void.class;
+  Class<?>returnType() default void.class;
 
 }

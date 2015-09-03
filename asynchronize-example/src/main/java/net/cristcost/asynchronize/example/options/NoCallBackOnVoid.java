@@ -6,4 +6,6 @@ import net.cristcost.asynchronize.processor.Asynchronize;
 public interface NoCallBackOnVoid {
 
   void aMethodThatReturnsNothing();
+
+  String aMethodThatReturnsSomething();
 }
