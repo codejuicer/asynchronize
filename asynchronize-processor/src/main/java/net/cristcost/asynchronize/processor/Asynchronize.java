@@ -9,4 +9,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Asynchronize {
 
+  boolean origin() default false;
+
+  boolean fireAndForget() default false;
+
+  Class<?>callback() default AsyncCallback.class;
+
+  Class<?>returnType() default Void.class;
+
 }
