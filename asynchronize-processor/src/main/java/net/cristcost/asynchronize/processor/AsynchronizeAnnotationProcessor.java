@@ -65,29 +65,20 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
     method.returns(asyncReturnType);
 
     for (VariableElement variableElement : methodElement.getParameters()) {
-
       method.addParameter(TypeName.get(variableElement.asType()),
           variableElement.getSimpleName().toString());
     }
 
     TypeName returnType = TypeName.get(methodElement.getReturnType());
-    if (returnType.isPrimitive() || returnType == TypeName.VOID) {
-      returnType = returnType.box();
-    }
+    boolean returnIsVoid = returnType.equals(TypeName.VOID);
+    if (fireAndForget && returnIsVoid) {
 
-    // if fire and forget don't add callback on void
-    // System.out.println("---------------------");
-    // System.out.println("---------------------");
-    // System.out.println(methodElement.getSimpleName().toString());
-
-    if (!fireAndForget || returnType != TypeName.VOID) {
-      method.addParameter(ParameterizedTypeName.get(callbackType, returnType), "callback");
-      // System.out.println("------ CALLBACK ---------------");
     } else {
-      // System.out.println("------ FORGET ---------------");
+      if (returnType.isPrimitive() || returnIsVoid) {
+        returnType = returnType.box();
+      }
+      method.addParameter(ParameterizedTypeName.get(callbackType, returnType), "callback");
     }
-    // System.out.println("---------------------");
-    // System.out.println("---------------------");
 
     return method.build();
   }
@@ -139,7 +130,6 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
         ElementFilter.methodsIn(asynchronizeElement.getEnclosedElements()));
 
     Asynchronize generationOptions = asynchronizeElement.getAnnotation(Asynchronize.class);
-    boolean fireAndForget = generationOptions.fireAndForget();
 
     try {
 
@@ -148,8 +138,9 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
 
       Builder interfaceBuilder =
           createInterfaceBuilder(asynchronizeElement, asyncClassSimpleName);
-
+      boolean fireAndForget = generationOptions.fireAndForget();
       boolean addOriginAnnotation = generationOptions.origin();
+
       Element element = processingEnv.getTypeUtils().asElement(tmpCallback(generationOptions));
       ClassName callbackType;
       if (element.equals(asynchronizeElement)) {
