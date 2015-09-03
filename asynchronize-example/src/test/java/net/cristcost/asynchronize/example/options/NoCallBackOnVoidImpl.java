@@ -1,5 +1,5 @@
 package net.cristcost.asynchronize.example.options;
 
-public class NoCallBackOnVoidImpl implements NoCallBackOnVoidAsync {
+public abstract class NoCallBackOnVoidImpl implements NoCallBackOnVoidAsync {
 
 }

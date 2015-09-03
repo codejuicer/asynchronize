@@ -1,5 +1,5 @@
 package net.cristcost.asynchronize.example.options;
 
-public class CustomCallbackClassImpl implements CustomCallbackClassAsync {
+public abstract class CustomCallbackClassImpl implements CustomCallbackClassAsync {
 
 }

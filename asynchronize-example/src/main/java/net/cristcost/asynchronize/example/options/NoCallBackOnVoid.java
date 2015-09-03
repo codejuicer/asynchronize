@@ -5,4 +5,5 @@ import net.cristcost.asynchronize.processor.Asynchronize;
 @Asynchronize(fireAndForget = true)
 public interface NoCallBackOnVoid {
 
+  void aMethodThatReturnsNothing();
 }

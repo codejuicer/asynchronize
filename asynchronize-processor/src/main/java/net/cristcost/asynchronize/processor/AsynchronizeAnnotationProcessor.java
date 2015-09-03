@@ -1,6 +1,8 @@
 package net.cristcost.asynchronize.processor;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -10,7 +12,6 @@ import com.squareup.javapoet.TypeSpec.Builder;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +20,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -107,21 +107,23 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
     final List<ExecutableElement> methodsToAsyncronize = new ArrayList<ExecutableElement>(
         ElementFilter.methodsIn(asynchronizeElement.getEnclosedElements()));
 
+    Asynchronize generationOptions = asynchronizeElement.getAnnotation(Asynchronize.class);
+
     try {
 
       String asyncClassSimpleName = asynchronizeElement.getSimpleName().toString() + SUFFIX;
-
       String packageName = extractPackageNameString(asynchronizeElement);
-      Builder interfaceBuilder = TypeSpec.interfaceBuilder(asyncClassSimpleName);
 
-      // warn if input element is not public
-      if (!asynchronizeElement.getModifiers().contains(Modifier.PUBLIC)) {
-        processingEnv.getMessager().printMessage(Kind.MANDATORY_WARNING,
-            "Warning: @Asynchronize annotated interface should be public",
-            asynchronizeElement);
+      Builder interfaceBuilder =
+          createInterfaceBuilder(asynchronizeElement, asyncClassSimpleName);
+
+      // add annotation to trace back to original interface via reflection
+      if (generationOptions.origin()) {
+        CodeBlock codeBlock =
+            CodeBlock.builder().add("$T.class", asynchronizeElement.asType()).build();
+        interfaceBuilder.addAnnotation(
+            AnnotationSpec.builder(AsyncOf.class).addMember("value", codeBlock).build());
       }
-      interfaceBuilder.addModifiers(Modifier.PUBLIC); // async will be public
-                                                      // anyway
 
       // management of exented asynchronize interfaces
       for (TypeMirror extendedInterfaceMirror : asynchronizeElement.getInterfaces()) {
@@ -145,54 +147,24 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
       JavaFile.builder(packageName, interfaceBuilder.build()).build().writeTo(
           processingEnv.getFiler());
 
-      // JavaWriter jw = new JavaWriter(writer);
-      //
-      // PackageElement pkg =
-      // processingEnv.getElementUtils().getPackageOf(processedTypeElement);
-      // if (!pkg.isUnnamed()) {
-      // jw.emitPackage(pkg.getQualifiedName().toString());
-      // jw.emitEmptyLine();
-      // } else {
-      // jw.emitPackage("");
-      // }
-      //
-      // jw.emitAnnotation(AsyncOf.class,
-      // processedTypeElement.getQualifiedName().toString() + ".class");
-      //
-      // jw.beginType(classFileName, "interface", EnumSet.of(Modifier.PUBLIC));
-      // jw.emitEmptyLine();
-      //
-      // for (ExecutableElement methodElement : methodsToAsyncronize) {
-      //
-      // // String functionName = methodElement.getSimpleName().toString();
-      // // writer.append("// " + functionName + System.lineSeparator());
-      // // writer.append(System.lineSeparator());
-      //
-      // String methodName = methodElement.getSimpleName().toString();
-      //
-      // jw.beginMethod("void", methodName, EnumSet.of(Modifier.PUBLIC));
-      // jw.endMethod();
-      // }
-      //
-      // jw.endType();
-      //
-      // jw.close();
-
-      // writer.append("/* todo generation */");
-      // writer.append(System.lineSeparator());
-      //
-      // for (ExecutableElement methodElement : methodsToAsyncronize) {
-      // String functionName = methodElement.getSimpleName().toString();
-      // writer.append("// " + functionName + System.lineSeparator());
-      // writer.append(System.lineSeparator());
-      // }
-      //
-      // writer.append(System.lineSeparator());
-      // writer.flush();
-      // writer.close();
     } catch (IOException e) {
       processingEnv.getMessager().printMessage(Kind.ERROR, e.getMessage());
     }
+  }
+
+  private Builder createInterfaceBuilder(TypeElement asynchronizeElement,
+      String asyncClassSimpleName) {
+    Builder interfaceBuilder = TypeSpec.interfaceBuilder(asyncClassSimpleName);
+
+    // warn if input element is not public
+    if (!asynchronizeElement.getModifiers().contains(Modifier.PUBLIC)) {
+      processingEnv.getMessager().printMessage(Kind.MANDATORY_WARNING,
+          "Warning: @Asynchronize annotated interface should be public",
+          asynchronizeElement);
+    }
+    interfaceBuilder.addModifiers(Modifier.PUBLIC); // async will be public
+                                                    // anyway
+    return interfaceBuilder;
   }
 
   private void processExtendedAsyncInterface(Builder interfaceBuilder,

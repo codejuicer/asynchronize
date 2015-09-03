@@ -2,10 +2,8 @@ package net.cristcost.asynchronize.example.options;
 
 import net.cristcost.asynchronize.processor.Asynchronize;
 
-@Asynchronize(returnType = boolean.class)
-public interface CustomReturnType {
-
-  void sampleVoidMethod();
+@Asynchronize(callback = NestedCallbackClass.class)
+public interface NestedCallbackClass {
 
   String sampleStringMethod(String str);
 
