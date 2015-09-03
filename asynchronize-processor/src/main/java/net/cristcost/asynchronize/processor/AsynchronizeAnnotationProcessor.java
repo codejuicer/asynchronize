@@ -212,6 +212,7 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
     }
   }
 
+  @Deprecated
   private TypeMirror tmpCallback(Asynchronize generationOptions) {
     try {
       Class<?> a = generationOptions.callback();
@@ -221,6 +222,7 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
     throw new RuntimeException("This method is only valid in annotation processing");
   }
 
+  @Deprecated
   private TypeMirror tmpReturnType(Asynchronize generationOptions) {
     try {
       Class<?> a = generationOptions.returnType();
