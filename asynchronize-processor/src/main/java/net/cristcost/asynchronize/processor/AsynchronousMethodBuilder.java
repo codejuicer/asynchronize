@@ -77,7 +77,10 @@ class AsynchronousMethodBuilder {
       TypeName asyncReturnType) {
     MethodSpec.Builder asyncMethodSpec =
         MethodSpec.methodBuilder(syncMethodElement.getSimpleName().toString()).addModifiers(
-            PUBLIC, ABSTRACT).returns(asyncReturnType);
+            PUBLIC, ABSTRACT);
+    if (asyncReturnType != null) {
+      asyncMethodSpec.returns(asyncReturnType);
+    }
     return asyncMethodSpec;
   }
 
