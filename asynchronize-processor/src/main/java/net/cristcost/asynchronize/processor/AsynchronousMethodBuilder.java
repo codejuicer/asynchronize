@@ -45,13 +45,13 @@ class AsynchronousMethodBuilder {
       addParameterToMethodSpec(asyncMethodSpec, arg.asType(), arg.getSimpleName().toString());
     }
 
-    addCalbackParameterToMethodSpec(asyncMethodSpec, syncMethodElement, fireAndForget,
+    addCallbackParameterToMethodSpec(asyncMethodSpec, syncMethodElement, fireAndForget,
         callbackType);
 
     return asyncMethodSpec.build();
   }
 
-  private static void addCalbackParameterToMethodSpec(MethodSpec.Builder asyncMethodSpec,
+  private static void addCallbackParameterToMethodSpec(MethodSpec.Builder asyncMethodSpec,
       ExecutableElement syncMethodElement, boolean fireAndForget, ClassName callbackType) {
 
     // add callback parameter, unless it is void and using fire and forget
