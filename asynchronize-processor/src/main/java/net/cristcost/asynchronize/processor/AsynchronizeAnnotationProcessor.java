@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -43,9 +44,9 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import javax.tools.Diagnostic.Kind;
-
-import static javax.lang.model.element.Modifier.*;
 
 /**
  * This Processor generates asynchronous version of interfaces annotated with
@@ -59,6 +60,11 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
 
   /** Suffix used for the name of the generated interface. */
   private static final String SUFFIX = "Async";
+
+  private static boolean isAnnotatedWithAsynchornize(TypeElement extendedInterface) {
+    Asynchronize annotation = extendedInterface.getAnnotation(Asynchronize.class);
+    return annotation != null ? true : false;
+  }
 
   @Override
   public boolean process(final Set<? extends TypeElement> annotations,
@@ -76,19 +82,72 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
     return true;
   }
 
-  private Builder createInterfaceBuilder(TypeElement asynchronizeElement,
-      String asyncClassSimpleName) {
-    Builder interfaceBuilder = TypeSpec.interfaceBuilder(asyncClassSimpleName);
+  protected void processElementAnnotatedWithAsynchronize(TypeElement inputInterfaceElement) {
 
-    // warn if input element is not public
-    if (!asynchronizeElement.getModifiers().contains(Modifier.PUBLIC)) {
-      processingEnv.getMessager().printMessage(Kind.MANDATORY_WARNING,
-          "Warning: @Asynchronize annotated interface should be public",
-          asynchronizeElement);
+    Asynchronize generationOptions = inputInterfaceElement.getAnnotation(Asynchronize.class);
+
+    final List<ExecutableElement> methodsToAsyncronize = new ArrayList<ExecutableElement>(
+        ElementFilter.methodsIn(inputInterfaceElement.getEnclosedElements()));
+
+    String asyncInterfaceName = inputInterfaceElement.getSimpleName().toString() + SUFFIX;
+    String packageName = extractPackageNameString(inputInterfaceElement);
+    boolean fireAndForget = generationOptions.fireAndForget();
+    boolean addOriginAnnotation = generationOptions.origin();
+
+    Builder outputInterfaceBuilder =
+        initializeInterfaceTypeSpec(inputInterfaceElement, asyncInterfaceName);
+
+    ClassName callbackClassName =
+        getNameOrGenerateNestedCallback(inputInterfaceElement, outputInterfaceBuilder,
+            envTypeUtils().asElement(tmpCallback(generationOptions)));
+
+    TypeName asyncReturnTypeName = TypeName.get(tmpReturnType(generationOptions));
+
+    if (addOriginAnnotation) {
+      addAsyncOfAnnotation(inputInterfaceElement, outputInterfaceBuilder);
     }
-    interfaceBuilder.addModifiers(Modifier.PUBLIC); // async will be public
-                                                    // anyway
-    return interfaceBuilder;
+
+    // management of exented asynchronize interfaces
+    for (TypeMirror extendedInterfaceMirror : inputInterfaceElement.getInterfaces()) {
+      manageExtendedInterface(methodsToAsyncronize, outputInterfaceBuilder,
+          extendedInterfaceMirror);
+    }
+
+    // management of each method
+    for (ExecutableElement methodElement : methodsToAsyncronize) {
+      MethodSpec asyncMethod =
+          AsynchronousMethodBuilder.createAsyncMethod(methodElement, fireAndForget,
+              asyncReturnTypeName, callbackClassName);
+      outputInterfaceBuilder.addMethod(asyncMethod);
+    }
+
+    // Write file
+    try {
+      JavaFile.builder(packageName, outputInterfaceBuilder.build()).build().writeTo(
+          processingEnv.getFiler());
+    } catch (IOException e) {
+      envMessager().printMessage(Kind.ERROR, e.getMessage());
+    }
+  }
+
+  private void addAsyncOfAnnotation(TypeElement inputInterfaceElement,
+      Builder outputInterfaceBuilder) {
+    CodeBlock codeBlock =
+        CodeBlock.builder().add("$T.class", inputInterfaceElement.asType()).build();
+    outputInterfaceBuilder.addAnnotation(
+        AnnotationSpec.builder(AsyncOf.class).addMember("value", codeBlock).build());
+  }
+
+  private Elements envElementUtils() {
+    return processingEnv.getElementUtils();
+  }
+
+  private Messager envMessager() {
+    return processingEnv.getMessager();
+  }
+
+  private Types envTypeUtils() {
+    return processingEnv.getTypeUtils();
   }
 
   private List<ExecutableElement> extractAllSuperMethods(
@@ -100,100 +159,83 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
     for (TypeMirror typeMirror : extendedInterface.getInterfaces()) {
       methods.addAll(
           extractAllSuperMethods(
-              (TypeElement) processingEnv.getTypeUtils().asElement(typeMirror)));
+              (TypeElement) envTypeUtils().asElement(typeMirror)));
     }
 
     return methods;
   }
 
   private String extractPackageNameString(TypeElement asynchronizeElement) {
-    PackageElement pkg = processingEnv.getElementUtils().getPackageOf(asynchronizeElement);
+    PackageElement pkg = envElementUtils().getPackageOf(asynchronizeElement);
     String packageName = pkg.isUnnamed() ? null : pkg.getQualifiedName().toString();
     return packageName;
   }
 
-  private boolean isAnnotatedWithAsynchornize(TypeElement extendedInterface) {
-    Asynchronize annotation = extendedInterface.getAnnotation(Asynchronize.class);
-    return annotation != null ? true : false;
+  private ClassName getNameOrGenerateNestedCallback(TypeElement asynchronizeElement,
+      Builder interfaceBuilder,
+      Element element) {
+    ClassName callbackType;
+    if (element.equals(asynchronizeElement)) {
+
+      Builder innerCallbackBuilder =
+          TypeSpec.interfaceBuilder("Callback").addModifiers(Modifier.PUBLIC,
+              Modifier.STATIC);
+      TypeVariableName typeVariableName = TypeVariableName.get("R");
+      innerCallbackBuilder.addTypeVariable(typeVariableName);
+      innerCallbackBuilder.addMethod(
+          MethodSpec.methodBuilder("onFailure").addModifiers(Modifier.PUBLIC,
+              Modifier.ABSTRACT).addParameter(
+                  Throwable.class, "caught").build());
+      innerCallbackBuilder.addMethod(
+          MethodSpec.methodBuilder("onSuccess").addModifiers(Modifier.PUBLIC,
+              Modifier.ABSTRACT).addParameter(
+                  typeVariableName, "result").build());
+      interfaceBuilder.addType(innerCallbackBuilder.build());
+
+      callbackType = ClassName.bestGuess("Callback");
+    } else {
+      callbackType = ClassName.get((TypeElement) element);
+    }
+    return callbackType;
   }
 
-  private void processElementAnnotatedWithAsynchronize(TypeElement asynchronizeElement) {
+  private Builder initializeInterfaceTypeSpec(TypeElement asynchronizeElement,
+      String asyncClassSimpleName) {
+    Builder interfaceBuilder = TypeSpec.interfaceBuilder(asyncClassSimpleName);
 
-    final List<ExecutableElement> methodsToAsyncronize = new ArrayList<ExecutableElement>(
-        ElementFilter.methodsIn(asynchronizeElement.getEnclosedElements()));
-
-    Asynchronize generationOptions = asynchronizeElement.getAnnotation(Asynchronize.class);
-
-    try {
-
-      String asyncClassSimpleName = asynchronizeElement.getSimpleName().toString() + SUFFIX;
-      String packageName = extractPackageNameString(asynchronizeElement);
-
-      Builder interfaceBuilder =
-          createInterfaceBuilder(asynchronizeElement, asyncClassSimpleName);
-      boolean fireAndForget = generationOptions.fireAndForget();
-      boolean addOriginAnnotation = generationOptions.origin();
-
-      Element element = processingEnv.getTypeUtils().asElement(tmpCallback(generationOptions));
-      ClassName callbackType;
-      if (element.equals(asynchronizeElement)) {
-
-        Builder innerCallbackBuilder =
-            TypeSpec.interfaceBuilder("Callback").addModifiers(Modifier.PUBLIC,
-                Modifier.STATIC);
-        TypeVariableName typeVariableName = TypeVariableName.get("R");
-        innerCallbackBuilder.addTypeVariable(typeVariableName);
-        innerCallbackBuilder.addMethod(
-            MethodSpec.methodBuilder("onFailure").addModifiers(Modifier.PUBLIC,
-                Modifier.ABSTRACT).addParameter(
-                    Throwable.class, "caught").build());
-        innerCallbackBuilder.addMethod(
-            MethodSpec.methodBuilder("onSuccess").addModifiers(Modifier.PUBLIC,
-                Modifier.ABSTRACT).addParameter(
-                    typeVariableName, "result").build());
-        interfaceBuilder.addType(innerCallbackBuilder.build());
-
-        callbackType = ClassName.bestGuess("Callback");
-      } else {
-        callbackType = ClassName.get((TypeElement) element);
-      }
-
-      TypeName asyncReturnType = TypeName.get(tmpReturnType(generationOptions));
-
-      // add annotation to trace back to original interface via reflection
-      if (addOriginAnnotation) {
-        CodeBlock codeBlock =
-            CodeBlock.builder().add("$T.class", asynchronizeElement.asType()).build();
-        interfaceBuilder.addAnnotation(
-            AnnotationSpec.builder(AsyncOf.class).addMember("value", codeBlock).build());
-      }
-
-      // management of exented asynchronize interfaces
-      for (TypeMirror extendedInterfaceMirror : asynchronizeElement.getInterfaces()) {
-        TypeElement extendedInterface =
-            (TypeElement) processingEnv.getTypeUtils().asElement(extendedInterfaceMirror);
-
-        if (isAnnotatedWithAsynchornize(extendedInterface)) {
-          processExtendedAsyncInterface(interfaceBuilder, extendedInterface);
-        } else {
-          methodsToAsyncronize.addAll(
-              extractAllSuperMethods(extendedInterface));
-        }
-      }
-
-      // management of each method
-      for (ExecutableElement methodElement : methodsToAsyncronize) {
-        interfaceBuilder.addMethod(
-            AsynchronousMethodBuilder.createAsyncMethod(methodElement, fireAndForget, asyncReturnType, callbackType));
-      }
-
-      // Write file
-      JavaFile.builder(packageName, interfaceBuilder.build()).build().writeTo(
-          processingEnv.getFiler());
-
-    } catch (IOException e) {
-      processingEnv.getMessager().printMessage(Kind.ERROR, e.getMessage());
+    // warn if input element is not public
+    if (!asynchronizeElement.getModifiers().contains(Modifier.PUBLIC)) {
+      envMessager().printMessage(Kind.MANDATORY_WARNING,
+          "Warning: @Asynchronize annotated interface should be public",
+          asynchronizeElement);
     }
+    interfaceBuilder.addModifiers(Modifier.PUBLIC); // async will be public
+                                                    // anyway
+    return interfaceBuilder;
+  }
+
+  private void manageExtendedInterface(final List<ExecutableElement> methodsToAsyncronize,
+      Builder outputInterfaceBuilder, TypeMirror extendedInterfaceMirror) {
+    TypeElement extendedInterface =
+        (TypeElement) envTypeUtils().asElement(extendedInterfaceMirror);
+
+    if (isAnnotatedWithAsynchornize(extendedInterface)) {
+      // TODO: the extended interface must be compatible, add a check here and
+      // throw error
+      processExtendedAsyncInterface(outputInterfaceBuilder, extendedInterface);
+    } else {
+      methodsToAsyncronize.addAll(
+          extractAllSuperMethods(extendedInterface));
+    }
+  }
+
+  private void processExtendedAsyncInterface(Builder interfaceBuilder,
+      TypeElement extendedInterface) {
+    TypeName extendedInterfaceName =
+        ClassName.get(extractPackageNameString(extendedInterface),
+            extendedInterface.getSimpleName().toString() + SUFFIX);
+
+    interfaceBuilder.addSuperinterface(extendedInterfaceName);
   }
 
   @Deprecated
@@ -214,15 +256,6 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
       return e.getTypeMirror();
     }
     throw new RuntimeException("This method is only valid in annotation processing");
-  }
-
-  private void processExtendedAsyncInterface(Builder interfaceBuilder,
-      TypeElement extendedInterface) {
-    TypeName extendedInterfaceName =
-        ClassName.get(extractPackageNameString(extendedInterface),
-            extendedInterface.getSimpleName().toString() + SUFFIX);
-
-    interfaceBuilder.addSuperinterface(extendedInterfaceName);
   }
 
 }

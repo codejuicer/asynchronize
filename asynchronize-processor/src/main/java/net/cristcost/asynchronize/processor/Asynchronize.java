@@ -29,9 +29,10 @@ import java.lang.annotation.Target;
 public @interface Asynchronize {
 
   /**
-   * If true, AsyncOf annotation is added to the generated interface.
+   * Class to be used for Callback parameter. Target class must accept a generic
+   * parameter, which will be used with the original return type.
    */
-  boolean origin() default false;
+  Class<?>callback() default AsyncCallback.class;
 
   /**
    * If true, don't callback parameter is not generated in methods returning
@@ -40,10 +41,9 @@ public @interface Asynchronize {
   boolean fireAndForget() default false;
 
   /**
-   * Class to be used for Callback parameter. Target class must accept a generic
-   * parameter, which will be used with the original return type.
+   * If true, AsyncOf annotation is added to the generated interface.
    */
-  Class<?>callback() default AsyncCallback.class;
+  boolean origin() default false;
 
   /**
    * Return type of the generated methods in async interface. Generated

@@ -31,9 +31,6 @@ import static javax.lang.model.element.Modifier.*;
  */
 class AsynchronousMethodBuilder {
 
-  private AsynchronousMethodBuilder() {
-  }
-
   /**
    * Creates the MetodSpec of Async method from the {@link ExecutableElement} of
    * the original method
@@ -82,6 +79,9 @@ class AsynchronousMethodBuilder {
         MethodSpec.methodBuilder(syncMethodElement.getSimpleName().toString()).addModifiers(
             PUBLIC, ABSTRACT).returns(asyncReturnType);
     return asyncMethodSpec;
+  }
+
+  private AsynchronousMethodBuilder() {
   }
 
 }
