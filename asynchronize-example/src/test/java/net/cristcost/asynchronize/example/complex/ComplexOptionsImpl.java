@@ -130,7 +130,23 @@ public class ComplexOptionsImpl implements ComplexOptionsAsync {
   }
 
   @Override
-  public Object thirdPartyMethod() {
+  public Object goToNorth() {
     return null;
   }
+
+  @Override
+  public Object goToWest() {
+    return null;
+  }
+
+  @Override
+  public Object goToEst() {
+    return null;
+  }
+
+  @Override
+  public Object goToSouth() {
+    return null;
+  }
+
 }

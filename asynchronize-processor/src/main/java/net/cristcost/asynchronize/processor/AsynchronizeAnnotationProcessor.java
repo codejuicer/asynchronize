@@ -27,6 +27,7 @@ import com.squareup.javapoet.TypeVariableName;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -157,7 +158,7 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
 
   protected void processElementAnnotatedWithAsynchronize(TypeElement inputInterfaceElement) {
 
-    final List<ExecutableElement> methodsToAsyncronize = new ArrayList<ExecutableElement>(
+    final Set<ExecutableElement> methodsToAsyncronize = new HashSet<ExecutableElement>(
         ElementFilter.methodsIn(inputInterfaceElement.getEnclosedElements()));
 
     String asyncInterfaceName = inputInterfaceElement.getSimpleName().toString() + SUFFIX;
@@ -276,7 +277,7 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
     return interfaceBuilder;
   }
 
-  private void manageExtendedInterface(final List<ExecutableElement> methodsToAsyncronize,
+  private void manageExtendedInterface(final Set<ExecutableElement> methodsToAsyncronize,
       Builder outputInterfaceBuilder, TypeMirror extendedInterfaceMirror) {
     TypeElement extendedInterface =
         (TypeElement) env.typeUtils().asElement(extendedInterfaceMirror);

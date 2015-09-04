@@ -1,6 +1,6 @@
 package net.cristcost.asynchronize.example.complex;
 
-import net.cristcost.asynchronize.example.notmodifiable.ThirdPartyService;
+import net.cristcost.asynchronize.example.notmodifiable.ThirdPartyCompassService;
 import net.cristcost.asynchronize.processor.Asynchronize;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Asynchronize(fireAndForget = true, origin = true, callback = ComplexOptions.class,
     returnType = Object.class)
-public interface ComplexOptions extends ThirdPartyService {
+public interface ComplexOptions extends ThirdPartyCompassService {
 
   public void simpleParameter(Map<Integer, String> simpleParameterParam);
 

@@ -4,6 +4,6 @@ import net.cristcost.asynchronize.processor.Asynchronize;
 
 @Asynchronize
 
-public interface ThirdPartyWrapperService extends ThirdPartyService {
+public interface ThirdPartyWrapperService extends ThirdPartyCompassService {
 
 }
