@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015, Cristiano Costantini
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package net.cristcost.asynchronize.processor;
 
 import com.squareup.javapoet.AnnotationSpec;
@@ -5,7 +20,6 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
@@ -26,18 +40,24 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic.Kind;
 
+import static javax.lang.model.element.Modifier.*;
+
+/**
+ * This Processor generates asynchronous version of interfaces annotated with
+ * {@link Asynchronize} annotation.
+ */
 @SupportedAnnotationTypes({
     "net.cristcost.asynchronize.processor.Asynchronize"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
 
+  /** Suffix used for the name of the generated interface. */
   private static final String SUFFIX = "Async";
 
   @Override
@@ -54,33 +74,6 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
       }
     }
     return true;
-  }
-
-  private MethodSpec createAsyncMethod(ExecutableElement methodElement,
-      boolean fireAndForget, TypeName asyncReturnType, ClassName callbackType) {
-    MethodSpec.Builder method =
-        MethodSpec.methodBuilder(methodElement.getSimpleName().toString());
-    method.addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
-
-    method.returns(asyncReturnType);
-
-    for (VariableElement variableElement : methodElement.getParameters()) {
-      method.addParameter(TypeName.get(variableElement.asType()),
-          variableElement.getSimpleName().toString());
-    }
-
-    TypeName returnType = TypeName.get(methodElement.getReturnType());
-    boolean returnIsVoid = returnType.equals(TypeName.VOID);
-    if (fireAndForget && returnIsVoid) {
-
-    } else {
-      if (returnType.isPrimitive() || returnIsVoid) {
-        returnType = returnType.box();
-      }
-      method.addParameter(ParameterizedTypeName.get(callbackType, returnType), "callback");
-    }
-
-    return method.build();
   }
 
   private Builder createInterfaceBuilder(TypeElement asynchronizeElement,
@@ -191,7 +184,7 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
       // management of each method
       for (ExecutableElement methodElement : methodsToAsyncronize) {
         interfaceBuilder.addMethod(
-            createAsyncMethod(methodElement, fireAndForget, asyncReturnType, callbackType));
+            AsynchronousMethodBuilder.createAsyncMethod(methodElement, fireAndForget, asyncReturnType, callbackType));
       }
 
       // Write file
