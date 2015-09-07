@@ -4,9 +4,9 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.asynchronize</groupId>
+	<groupId>org.codejuicer</groupId>
 	<artifactId>asynchronize-apt</artifactId>
-	<version>0.9.0</version>
+	<version>0.9.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Asynchronize :: Parent</name>
 	<description>APT processor to generate an asynchronous version of interfaces</description>

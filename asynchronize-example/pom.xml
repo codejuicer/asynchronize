@@ -5,9 +5,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.asynchronize</groupId>
+		<groupId>org.codejuicer</groupId>
 		<artifactId>asynchronize-apt</artifactId>
-		<version>0.9.0</version>
+		<version>0.9.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>asynchronize-example</artifactId>
@@ -21,7 +21,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.asynchronize</groupId>
+			<groupId>org.codejuicer</groupId>
 			<artifactId>asynchronize-processor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
