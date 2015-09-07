@@ -5,9 +5,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>net.cristcost</groupId>
+		<groupId>org.asynchronize</groupId>
 		<artifactId>asynchronize-apt</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>0.9.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>asynchronize-processor</artifactId>

@@ -5,9 +5,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>net.cristcost</groupId>
+		<groupId>org.asynchronize</groupId>
 		<artifactId>asynchronize-apt</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>0.9.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>asynchronize-example</artifactId>
@@ -15,22 +15,26 @@
 	<name>Asynchronize :: Example project</name>
 	<description>APT processor to generate an asynchronous version of interfaces</description>
 
+	<properties>
+		<guava.version>18.0</guava.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
-			<groupId>net.cristcost</groupId>
+			<groupId>org.asynchronize</groupId>
 			<artifactId>asynchronize-processor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>18.0</version>
+			<version>${guava.version}</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>18.0</version>
+			<version>${guava.version}</version>
 		</dependency>
 	</dependencies>
 
