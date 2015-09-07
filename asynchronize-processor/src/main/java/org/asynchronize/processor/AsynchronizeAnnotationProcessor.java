@@ -167,13 +167,21 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
     final Set<ExecutableElement> methodsToAsyncronize = new HashSet<ExecutableElement>(
         ElementFilter.methodsIn(inputInterfaceElement.getEnclosedElements()));
 
-    String asyncInterfaceName = inputInterfaceElement.getSimpleName().toString() + SUFFIX;
+    String interfaceName = inputInterfaceElement.getSimpleName().toString();
+    String asyncInterfaceName = interfaceName + SUFFIX;
     String packageName = extractPackageNameString(inputInterfaceElement);
 
     Options generationOptions = extractGenerationOptions(inputInterfaceElement);
 
     Builder outputInterfaceBuilder =
         initializeInterfaceTypeSpec(inputInterfaceElement, asyncInterfaceName);
+
+    String docComment = env.elementUtils().getDocComment(inputInterfaceElement);
+    if (docComment != null) {
+      outputInterfaceBuilder.addJavadoc("Asynchronous version of " + interfaceName + " \n");
+      outputInterfaceBuilder.addJavadoc("\n");
+      outputInterfaceBuilder.addJavadoc(docComment);
+    }
 
     ClassName callbackClassName =
         getNameOrGenerateNestedCallback(inputInterfaceElement, outputInterfaceBuilder,
@@ -196,6 +204,7 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
     List<ExecutableElement> sortedMethodsToAsyncronize =
         new ArrayList<ExecutableElement>(methodsToAsyncronize);
     Comparator<ExecutableElement> a = new Comparator<ExecutableElement>() {
+
       @Override
       public int compare(ExecutableElement o1, ExecutableElement o2) {
         return o1.getSimpleName().toString().compareTo(o2.getSimpleName().toString());
