@@ -27,6 +27,8 @@ import com.squareup.javapoet.TypeVariableName;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -186,8 +188,19 @@ public class AsynchronizeAnnotationProcessor extends AbstractProcessor {
           extendedInterfaceMirror);
     }
 
+    // sort methods by name
+    List<ExecutableElement> sortedMethodsToAsyncronize =
+        new ArrayList<ExecutableElement>(methodsToAsyncronize);
+    Comparator<ExecutableElement> a = new Comparator<ExecutableElement>() {
+      @Override
+      public int compare(ExecutableElement o1, ExecutableElement o2) {
+        return o1.getSimpleName().toString().compareTo(o2.getSimpleName().toString());
+      }
+    };
+    Collections.sort(sortedMethodsToAsyncronize, a);
+
     // management of each method
-    for (ExecutableElement methodElement : methodsToAsyncronize) {
+    for (ExecutableElement methodElement : sortedMethodsToAsyncronize) {
       MethodSpec asyncMethod =
           AsynchronousMethodBuilder.createAsyncMethod(methodElement,
               generationOptions.fireAndForget,
