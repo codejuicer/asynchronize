@@ -1,1 +1,1 @@
-net.cristcost.asynchronize.processor.AsynchronizeAnnotationProcessor
+org.asynchronize.processor.AsynchronizeAnnotationProcessor
