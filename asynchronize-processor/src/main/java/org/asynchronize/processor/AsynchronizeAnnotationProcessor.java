@@ -23,6 +23,11 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
+
+import org.asynchronize.annotation.AsyncCallback;
+import org.asynchronize.annotation.AsyncOf;
+import org.asynchronize.annotation.Asynchronize;
+
 import com.squareup.javapoet.TypeVariableName;
 
 import java.io.IOException;
@@ -58,7 +63,7 @@ import javax.tools.Diagnostic.Kind;
  * {@link Asynchronize} annotation.
  */
 @SupportedAnnotationTypes({
-    "org.asynchronize.processor.Asynchronize"
+    "org.asynchronize.annotation.Asynchronize"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class AsynchronizeAnnotationProcessor extends AbstractProcessor {

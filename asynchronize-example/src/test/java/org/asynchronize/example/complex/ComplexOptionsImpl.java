@@ -3,6 +3,8 @@ package org.asynchronize.example.complex;
 import java.util.List;
 import java.util.Map;
 
+import javax.security.auth.callback.Callback;
+
 public class ComplexOptionsImpl implements ComplexOptionsAsync {
 
   @Override

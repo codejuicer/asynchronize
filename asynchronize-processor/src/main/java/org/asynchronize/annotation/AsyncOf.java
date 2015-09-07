@@ -13,8 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
-package org.asynchronize.processor;
+package org.asynchronize.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,33 +21,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Generates Async version of interfaces annotate with this.
+ * This annotation is added to the generated async interface if origin=true in
+ * {@link Asynchronize} annotation, and can be used with reflection to find the
+ * original input interface.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Asynchronize {
+public @interface AsyncOf {
 
-  /**
-   * Class to be used for Callback parameter. Target class must accept a generic
-   * parameter, which will be used with the original return type.
-   */
-  Class<?>callback() default AsyncCallback.class;
-
-  /**
-   * If true, don't callback parameter is not generated in methods returning
-   * void
-   */
-  boolean fireAndForget() default false;
-
-  /**
-   * If true, AsyncOf annotation is added to the generated interface.
-   */
-  boolean origin() default false;
-
-  /**
-   * Return type of the generated methods in async interface. Generated
-   * asynchronous method return void by default.
-   */
-  Class<?>returnType() default void.class;
+  Class<?>value();
 
 }

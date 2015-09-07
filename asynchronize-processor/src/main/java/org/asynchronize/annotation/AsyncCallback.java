@@ -13,22 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.asynchronize.processor;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package org.asynchronize.annotation;
 
 /**
- * This annotation is added to the generated async interface if origin=true in
- * {@link Asynchronize} annotation, and can be used with reflection to find the
- * original input interface.
+ * Interface AsyncCallback to collect capture results asynchronously.
+ *
+ * @param <T> the generic type
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface AsyncOf {
+public interface AsyncCallback<T> {
 
-  Class<?>value();
+  void onFailure(Throwable caught);
 
+  void onSuccess(T result);
 }

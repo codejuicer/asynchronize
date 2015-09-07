@@ -1,6 +1,6 @@
 package org.asynchronize.example.notmodifiable;
 
-import org.asynchronize.processor.AsyncCallback;
+import org.asynchronize.annotation.AsyncCallback;
 
 public class ThirdPartyWrapperServiceImpl implements ThirdPartyWrapperServiceAsync {
 

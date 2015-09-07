@@ -1,7 +1,7 @@
 package org.asynchronize.example.complex;
 
+import org.asynchronize.annotation.Asynchronize;
 import org.asynchronize.example.notmodifiable.ThirdPartyCompassService;
-import org.asynchronize.processor.Asynchronize;
 
 import java.util.List;
 import java.util.Map;

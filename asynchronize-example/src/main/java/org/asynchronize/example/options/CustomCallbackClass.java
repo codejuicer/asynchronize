@@ -2,7 +2,7 @@ package org.asynchronize.example.options;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-import org.asynchronize.processor.Asynchronize;
+import org.asynchronize.annotation.Asynchronize;
 
 @Asynchronize(callback = FutureCallback.class)
 public interface CustomCallbackClass {

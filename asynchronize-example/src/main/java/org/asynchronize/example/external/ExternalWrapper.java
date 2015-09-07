@@ -2,7 +2,7 @@ package org.asynchronize.example.external;
 
 import com.google.common.util.concurrent.Service;
 
-import org.asynchronize.processor.Asynchronize;
+import org.asynchronize.annotation.Asynchronize;
 
 import java.util.concurrent.Executor;
 

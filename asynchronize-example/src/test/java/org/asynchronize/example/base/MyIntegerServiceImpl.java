@@ -1,6 +1,6 @@
 package org.asynchronize.example.base;
 
-import org.asynchronize.processor.AsyncCallback;
+import org.asynchronize.annotation.AsyncCallback;
 
 public class MyIntegerServiceImpl implements MyIntegerServiceAsync {
 

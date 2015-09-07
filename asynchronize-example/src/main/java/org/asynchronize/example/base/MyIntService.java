@@ -1,6 +1,6 @@
 package org.asynchronize.example.base;
 
-import org.asynchronize.processor.Asynchronize;
+import org.asynchronize.annotation.Asynchronize;
 
 @Asynchronize
 public interface MyIntService {

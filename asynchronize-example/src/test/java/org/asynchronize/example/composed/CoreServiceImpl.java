@@ -1,6 +1,6 @@
 package org.asynchronize.example.composed;
 
-import org.asynchronize.processor.AsyncCallback;
+import org.asynchronize.annotation.AsyncCallback;
 
 public class CoreServiceImpl implements CoreServiceAsync {
 

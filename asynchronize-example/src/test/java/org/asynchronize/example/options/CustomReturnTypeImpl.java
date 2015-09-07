@@ -1,6 +1,6 @@
 package org.asynchronize.example.options;
 
-import org.asynchronize.processor.AsyncCallback;
+import org.asynchronize.annotation.AsyncCallback;
 
 public class CustomReturnTypeImpl implements CustomReturnTypeAsync {
 
