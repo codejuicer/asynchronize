@@ -34,7 +34,9 @@
 	</licenses>
 
 	<scm>
-		<url>https://github.com/codejuicer/asynchronize</url>
+		<url>git@github.com:codejuicer/asynchronize.git</url>
+		<connection>scm:git:git@github.com:codejuicer/asynchronize.git</connection>
+		<developerConnection>scm:git:git@github.com:codejuicer/asynchronize.git</developerConnection>
 	</scm>
 
 	<modules>
