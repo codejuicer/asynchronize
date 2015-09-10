@@ -54,6 +54,14 @@
 
 	<build>	
 		<plugins>
+			<!-- maven incremenal build is not working with APT -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<useIncrementalCompilation>false</useIncrementalCompilation>
+				</configuration>
+			</plugin>
 			<!-- skip deployment of this example project -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
