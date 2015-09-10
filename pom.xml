@@ -75,11 +75,12 @@
 
 		<compiler.plugin.version>3.3</compiler.plugin.version>
 		<deploy.plugin.version>2.7</deploy.plugin.version>
+		<gpg.plugin.version>1.5</gpg.plugin.version>
 		<javadoc.plugin.version>2.10.1</javadoc.plugin.version>
 		<source.plugin.version>2.4</source.plugin.version>
 	</properties>
 
-
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -139,4 +140,29 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>gpgsign</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${gpg.plugin.version}</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>
