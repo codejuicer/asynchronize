@@ -1,7 +1,7 @@
 # Asynchronize Processor
 Generates an asynchronous version of a Java interface by using APT
 
-## Maven Dependency
+## Maven Coordinates
 
 ```
 <dependency>
@@ -12,7 +12,7 @@ Generates an asynchronous version of a Java interface by using APT
 ```
 
 ## Overview
-4 minutes [Video](https://youtu.be/YC853Kkm_6E)	overview of the library usage and feature
+-- Watch a 4 minutes [Video](https://youtu.be/YC853Kkm_6E) overview of the library  --
 
 This processor generates an 'asynchronous' interface from a Java interface, and creates a copy of all the methods accepting an extra argument for callback.
 
@@ -30,7 +30,7 @@ public interface HelloAsync {
 }
 ```
 
-It is designed to be used for (GWT)[http://www.gwtproject.org/] by specyfing its AsyncCallback as annotation option:
+It is designed to be used for [GWT](http://www.gwtproject.org/) by specyfing its AsyncCallback as annotation option:
 
 ```
 import com.google.gwt.user.client.rpc.AsyncCallback;
