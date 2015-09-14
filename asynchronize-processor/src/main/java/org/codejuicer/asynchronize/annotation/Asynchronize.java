@@ -35,7 +35,7 @@ public @interface Asynchronize {
   Class<?>callback() default AsyncCallback.class;
 
   /**
-   * If true, don't callback parameter is not generated in methods returning
+   * If true, the callback parameter is not generated in methods returning
    * void
    */
   boolean fireAndForget() default false;
@@ -47,7 +47,7 @@ public @interface Asynchronize {
 
   /**
    * Return type of the generated methods in async interface. Generated
-   * asynchronous method return void by default.
+   * asynchronous methods return void by default.
    */
   Class<?>returnType() default void.class;
 
