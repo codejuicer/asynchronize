@@ -15,20 +15,27 @@
  */
 package org.codejuicer.asynchronize.example.base;
 
-import org.codejuicer.asynchronize.annotation.Asynchronize;
+import org.codejuicer.asynchronize.annotation.AsyncCallback;
 
-import java.util.Map;
+public class MyCustomObjectServiceImpl implements MyCustomObjectServiceAsync {
 
-@Asynchronize
-public interface MyMapService {
+  @Override
+  public void multipleParam(CustomObject multipleParam1, CustomObject multipleParam2,
+      AsyncCallback<Void> callback) {
+  }
 
-  public void simpleParameter(Map<Integer, String> simpleParameterParam);
+  @Override
+  public void simpleParamReturn(CustomObject simpleParamReturnParam,
+      AsyncCallback<CustomObject> callback) {
+  }
 
-  public Map<Integer, String> simpleReturn(Map<Integer, String> simpleReturnParam);
+  @Override
+  public void simpleParameter(CustomObject simpleParameterParam,
+      AsyncCallback<Void> callback) {
+  }
 
-  public Map<Integer, String> simpleParamReturn(Map<Integer, String> simpleParamReturnParam);
-
-  public void multipleParam(Map<Integer, String> multipleParam1,
-      Map<Integer, String> multipleParam2);
-
+  @Override
+  public void simpleReturn(CustomObject simpleReturnParam,
+      AsyncCallback<CustomObject> callback) {
+  }
 }

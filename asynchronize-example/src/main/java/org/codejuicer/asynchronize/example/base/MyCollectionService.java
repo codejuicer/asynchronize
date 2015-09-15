@@ -17,18 +17,17 @@ package org.codejuicer.asynchronize.example.base;
 
 import org.codejuicer.asynchronize.annotation.Asynchronize;
 
-import java.util.Map;
+import java.util.List;
 
 @Asynchronize
 public interface MyCollectionService {
 
-  public void simpleParameter(Map<Integer, String> simpleParameterParam);
+  public void simpleParameter(List<String> simpleParameterParam);
 
-  public Map<Integer, String> simpleReturn(Map<Integer, String> simpleReturnParam);
+  public List<String> simpleReturn(List<String> simpleReturnParam);
 
-  public Map<Integer, String> simpleParamReturn(Map<Integer, String> simpleParamReturnParam);
+  public List<String> simpleParamReturn(List<String> simpleParamReturnParam);
 
-  public void multipleParam(Map<Integer, String> multipleParam1,
-      Map<Integer, String> multipleParam2);
+  public void multipleParam(List<String> multipleParam1, List<String> multipleParam2);
 
 }

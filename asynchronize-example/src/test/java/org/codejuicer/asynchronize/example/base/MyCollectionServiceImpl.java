@@ -17,27 +17,30 @@ package org.codejuicer.asynchronize.example.base;
 
 import org.codejuicer.asynchronize.annotation.AsyncCallback;
 
-import java.util.Map;
+import java.util.List;
 
 public class MyCollectionServiceImpl implements MyCollectionServiceAsync {
 
   @Override
-  public void simpleParameter(Map<Integer, String> simpleParameterParam,
+  public void multipleParam(List<String> multipleParam1, List<String> multipleParam2,
       AsyncCallback<Void> callback) {
+
   }
 
   @Override
-  public void simpleReturn(Map<Integer, String> simpleReturnParam,
-      AsyncCallback<Map<Integer, String>> callback) {
+  public void simpleParamReturn(List<String> simpleParamReturnParam,
+      AsyncCallback<List<String>> callback) {
+
   }
 
   @Override
-  public void simpleParamReturn(Map<Integer, String> simpleParamReturnParam,
-      AsyncCallback<Map<Integer, String>> callback) {
+  public void simpleParameter(List<String> simpleParameterParam,
+      AsyncCallback<Void> callback) {
+
   }
 
   @Override
-  public void multipleParam(Map<Integer, String> multipleParam1,
-      Map<Integer, String> multipleParam2, AsyncCallback<Void> callback) {
+  public void simpleReturn(List<String> simpleReturnParam,
+      AsyncCallback<List<String>> callback) {
   }
 }

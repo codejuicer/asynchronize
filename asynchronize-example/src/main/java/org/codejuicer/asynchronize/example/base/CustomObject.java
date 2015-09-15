@@ -15,20 +15,29 @@
  */
 package org.codejuicer.asynchronize.example.base;
 
-import org.codejuicer.asynchronize.annotation.Asynchronize;
+/**
+ * The Class CustomObject.
+ */
+public class CustomObject {
 
-import java.util.Map;
+  private CustomObject testField1;
 
-@Asynchronize
-public interface MyMapService {
+  private CustomObject testField2;
 
-  public void simpleParameter(Map<Integer, String> simpleParameterParam);
+  public CustomObject getTestField1() {
+    return testField1;
+  }
 
-  public Map<Integer, String> simpleReturn(Map<Integer, String> simpleReturnParam);
+  public void setTestField1(CustomObject testField1) {
+    this.testField1 = testField1;
+  }
 
-  public Map<Integer, String> simpleParamReturn(Map<Integer, String> simpleParamReturnParam);
+  public CustomObject getTestField2() {
+    return testField2;
+  }
 
-  public void multipleParam(Map<Integer, String> multipleParam1,
-      Map<Integer, String> multipleParam2);
+  public void setTestField2(CustomObject testField2) {
+    this.testField2 = testField2;
+  }
 
 }
